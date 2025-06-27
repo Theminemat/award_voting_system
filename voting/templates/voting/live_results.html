@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Counter - Award Voting</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Special design for screen presentation */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrollbars */
+            background-color: #000000; /* Pure black for maximum contrast */
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .live-counter-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        #total-votes-counter {
+            font-size: 25vw; /* Scales with the screen width for maximum impact */
+            font-weight: 700;
+            color: #00d4ff; /* Bright cyan */
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.4), 0 0 30px rgba(0, 212, 255, 0.6);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .lead {
+            font-size: 4vw; /* Scales with the screen width */
+            font-weight: 200; /* Thinner for more contrast to the counter */
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-top: 1.5rem;
+        }
+
+        /* Upper limit for very large screens */
+        @media (min-width: 1200px) {
+            #total-votes-counter {
+                font-size: 300px;
+            }
+            .lead {
+                font-size: 48px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="live-counter-wrapper">
+        <div class="counter-container">
+            <h1 id="total-votes-counter" class="display-1 fw-bold">0</h1>
+            <p class="lead">Votes Cast</p>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const counterElement = document.getElementById('total-votes-counter');
+    const apiUrl = "{% url 'voting:live_results_data' %}";
+
+    console.log("Live counter script started. API URL is:", apiUrl);
+
+    async function fetchAndUpdateCounter() {
+        try {
+            console.log("Sending API request to", apiUrl);
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                console.error('API response was not ok. Status:', response.status);
+                counterElement.textContent = "ERR"; // Show an error directly on the page
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Data received successfully:", data);
+
+            // Update the counter directly, without animation
+            counterElement.textContent = data.total_votes;
+
+        } catch (error) {
+            console.error('Error fetching API data:', error);
+            counterElement.textContent = "ERR"; // Show an error directly on the page
+        }
+    }
+
+    fetchAndUpdateCounter();
+    setInterval(fetchAndUpdateCounter, 2000);
+});
+</script>
+
+</body>
+</html>

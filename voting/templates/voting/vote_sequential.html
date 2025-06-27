@@ -1,0 +1,341 @@
+{% extends 'voting/base.html' %}
+{% load static %}
+
+{% block title %}Vote - Award Voting{% endblock %}
+
+{% block subtitle %}Choose your favorites{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+
+        <!-- Progress Stepper -->
+        <div class="card mb-4 progress-stepper-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="mb-0 text-muted">
+                        <i class="fas fa-tasks text-primary me-2"></i>
+                        Progress: Step {{ current_step }} of {{ total_steps }}
+                    </h6>
+                    <span class="badge bg-primary-soft text-primary fs-6">
+                        Code: {{ voting_code.code }}
+                    </span>
+                </div>
+
+                <div class="stepper-wrapper-container">
+                    <div class="stepper-wrapper">
+                        {% for category in all_categories %}
+                            <div class="stepper-item {% if forloop.counter0 < session.current_category_index %}completed{% elif forloop.counter0 == session.current_category_index %}active{% endif %}">
+                                <div class="step-counter">
+                                    {% if forloop.counter0 < session.current_category_index %}
+                                        <i class="fas fa-check"></i>
+                                    {% else %}
+                                        {{ forloop.counter }}
+                                    {% endif %}
+                                </div>
+                                <div class="step-name">{{ category.title|truncatechars:15 }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Category Card -->
+        <div class="card category-card shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h2 class="card-title fw-bold">
+                        <i class="fas fa-trophy text-warning me-2"></i>
+                        {{ current_category.title }}
+                    </h2>
+                    <p class="text-muted mb-0">{{ current_category.description }}</p>
+                </div>
+
+                {% if current_category.image %}
+                <div class="text-center mb-4">
+                    <img src="{{ current_category.image.url }}"
+                         alt="{{ current_category.title }}"
+                         class="img-fluid rounded shadow-sm"
+                         style="max-height: 250px; object-fit: cover; border: 3px solid #fff;">
+                </div>
+                {% endif %}
+
+                <form method="post" class="voting-form">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="person_select" class="form-label fs-5 mb-2">
+                            <i class="fas fa-user-friends text-primary me-2"></i>
+                            <strong>Select a Person:</strong>
+                        </label>
+                        <select class="form-select form-select-lg"
+                                id="person_select"
+                                name="person_id"
+                                required>
+                            <option value="" disabled selected>-- Please select a person --</option>
+                            {% for person in persons %}
+                                <option value="{{ person.id }}" {% if selected_person_id|stringformat:"s" == person.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ person.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle"></i>
+                            Names are sorted alphabetically by first name.
+                        </div>
+                    </div>
+
+                    {% if is_final_category %}
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Last Category!</strong> After this selection, your entire vote will be completed.
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+                        {% if session.current_category_index > 0 %}
+                            <button type="submit" name="action" value="previous" class="btn btn-outline-secondary btn-lg" formnovalidate>
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back
+                            </button>
+                        {% else %}
+                            <div></div>
+                        {% endif %}
+
+                        {% if is_final_category %}
+                            <button type="submit" name="action" value="next" class="btn btn-success btn-lg" id="submit-btn" disabled>
+                                <i class="fas fa-check-double me-2"></i>
+                                Complete Vote
+                            </button>
+                        {% else %}
+                            <button type="submit" name="action" value="next" class="btn btn-primary btn-lg" id="submit-btn" disabled>
+                                Next
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --primary-color-soft: #e7f1ff;
+        --success-color: #198754;
+        --light-gray: #f8f9fa;
+        --gray-border: #dee2e6;
+        --text-muted: #6c757d;
+    }
+
+    body {
+        background-color: var(--light-gray);
+    }
+
+    .progress-stepper-card {
+        background-color: #fff;
+        border-radius: 0.75rem;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .stepper-wrapper-container {
+        overflow-x: auto;
+        padding-bottom: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--light-gray);
+    }
+
+    .stepper-wrapper-container::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .stepper-wrapper-container::-webkit-scrollbar-track {
+        background: var(--light-gray);
+        border-radius: 10px;
+    }
+
+    .stepper-wrapper-container::-webkit-scrollbar-thumb {
+        background-color: var(--primary-color);
+        border-radius: 10px;
+    }
+
+    .stepper-wrapper {
+        display: flex;
+        justify-content: space-between;
+        min-width: 500px;
+    }
+
+    .stepper-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        color: var(--text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .stepper-item::before {
+        position: absolute;
+        content: "";
+        border-bottom: 3px solid var(--gray-border);
+        width: 100%;
+        top: 20px;
+        left: -50%;
+        z-index: 2;
+    }
+
+    .stepper-item::after {
+        position: absolute;
+        content: "";
+        border-bottom: 3px solid var(--gray-border);
+        width: 100%;
+        top: 20px;
+        left: 50%;
+        z-index: 2;
+    }
+
+    .stepper-item .step-counter {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid var(--gray-border);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .stepper-item.active .step-counter {
+        border-color: var(--primary-color);
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .stepper-item.completed .step-counter {
+        border-color: var(--success-color);
+        background-color: var(--success-color);
+        color: #fff;
+        font-size: 1.2rem;
+    }
+
+    .stepper-item.completed::after {
+        border-bottom-color: var(--success-color);
+    }
+
+    .stepper-item:first-child::before {
+        display: none;
+    }
+
+    .stepper-item:last-child::after {
+        display: none;
+    }
+
+    .step-name {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+     .stepper-item.active .step-name,
+     .stepper-item.completed .step-name {
+        color: #212529;
+        font-weight: 500;
+     }
+
+    .category-card {
+        border-radius: 0.75rem;
+        border: 1px solid var(--gray-border);
+        transition: all 0.3s ease;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-select-lg {
+        border: 2px solid var(--gray-border);
+        transition: all 0.3s ease;
+    }
+
+    .form-select-lg:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .bg-primary-soft {
+        background-color: var(--primary-color-soft);
+    }
+
+    #submit-btn:disabled {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    #submit-btn:not(:disabled).pulse-animation {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.5); }
+        70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const personSelect = document.getElementById('person_select');
+    const submitBtn = document.getElementById('submit-btn');
+    const votingForm = document.querySelector('.voting-form');
+
+    function updateSubmitButtonState() {
+        if (personSelect.value) {
+            submitBtn.disabled = false;
+            if (!submitBtn.classList.contains('btn-success')) {
+                submitBtn.classList.add('pulse-animation');
+            }
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('pulse-animation');
+        }
+    }
+
+    personSelect.addEventListener('change', updateSubmitButtonState);
+
+    updateSubmitButtonState();
+
+    votingForm.addEventListener('submit', function(e) {
+        const submitter = e.submitter;
+
+        if (submitter && submitter.name === 'action' && submitter.value === 'next') {
+            if (!personSelect.value) {
+                e.preventDefault();
+
+                personSelect.classList.add('is-invalid');
+                setTimeout(() => {
+                    personSelect.classList.remove('is-invalid');
+                }, 500);
+
+                personSelect.focus();
+            }
+        }
+    });
+
+    setTimeout(() => {
+        personSelect.focus();
+    }, 300);
+});
+</script>
+{% endblock %}

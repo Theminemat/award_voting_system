@@ -1,0 +1,203 @@
+{% extends 'voting/base.html' %}
+
+{% block title %}Results - Award Voting{% endblock %}
+
+{% block subtitle %}Voting Results (For Administrators Only){% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4><i class="fas fa-chart-bar text-primary"></i> Voting Results</h4>
+        <div>
+            <button onclick="window.print()" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+    <p class="text-muted">
+        <i class="fas fa-info-circle"></i>
+        This page shows the top 5 results per category with vote counts and percentages.
+    </p>
+</div>
+
+{% if results %}
+    {% for category, data in results.items %}
+        <div class="card category-card mb-4">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">
+                            <i class="fas fa-trophy text-warning"></i>
+                            {{ category.title }}
+                        </h5>
+                        <small class="text-muted">{{ category.description }}</small>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-info">
+                            Total: {{ data.total_votes }} vote{{ data.total_votes|pluralize }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if data.top_results %}
+                    <div class="results-table">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="10%">Rank</th>
+                                        <th width="30%">Name</th>
+                                        <th width="15%">Votes</th>
+                                        <th width="15%">Percentage</th>
+                                        <!-- The progress bar column doesn't need a title -->
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for result in data.top_results %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge {% if forloop.counter == 1 %}bg-warning{% elif forloop.counter == 2 %}bg-secondary{% elif forloop.counter == 3 %}bg-dark{% else %}bg-light text-dark{% endif %}">
+                                                    {% if forloop.counter == 1 %}
+                                                        <i class="fas fa-crown"></i> 1st
+                                                    {% elif forloop.counter == 2 %}
+                                                        <i class="fas fa-medal"></i> 2nd
+                                                    {% elif forloop.counter == 3 %}
+                                                        <i class="fas fa-award"></i> 3rd
+                                                    {% else %}
+                                                        {{ forloop.counter }}th
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <strong>{{ result.person.name }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ result.vote_count }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold">{{ result.percentage }}%</span>
+                                            </td>
+                                            <td>
+                                                <div class="progress">
+                                                    <div class="progress-bar {% if forloop.counter == 1 %}bg-warning{% elif forloop.counter == 2 %}bg-secondary{% elif forloop.counter == 3 %}bg-dark{% else %}bg-primary{% endif %}"
+                                                         role="progressbar"
+                                                         style="width: {{ result.percentage }}%"
+                                                         aria-valuenow="{{ result.percentage }}"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-vote-yea fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No votes in this category yet</h6>
+                        <p class="text-muted small">As soon as votes are cast, the results will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-chart-bar fa-4x text-muted mb-4"></i>
+        <h4 class="text-muted">No categories available</h4>
+        <p class="text-muted">No voting categories have been created yet.</p>
+        <a href="{% url 'admin:voting_category_add' %}" class="btn btn-vote">
+            <i class="fas fa-plus"></i> Add Category
+        </a>
+    </div>
+{% endif %}
+
+
+<style>
+@media print {
+    .btn, .card-header .col-auto, .progress {
+        display: none !important;
+    }
+
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        margin-bottom: 20px !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .main-container {
+        background: white !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+}
+
+.category-card {
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.progress {
+    height: 20px;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.875em;
+}
+
+/* Animation for progress bars */
+@keyframes progressAnimation {
+    from { width: 0%; }
+}
+
+.progress-bar {
+    animation: progressAnimation 1.5s ease-out;
+}
+</style>
+
+<script>
+// Animate progress bars on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 100);
+    });
+});
+
+// Auto-refresh every 30 seconds
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}
