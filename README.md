@@ -240,9 +240,9 @@ python manage.py createsuperuser
 -   Check if the code is active
 -   Check the usage count
 -   Check if a vote has already been cast
-```
+
 
 
 ## Lizenz
 
-Dieses Projekt ist für Bildungszwecke erstellt und kann frei verwendet werden.
+This project is licensed under the MIT License
