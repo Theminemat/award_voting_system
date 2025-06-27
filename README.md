@@ -204,19 +204,6 @@ It's recommended to set all credentials in an .env file and load them in setting
 
 3.  Configure Nginx as a reverse proxy
 
-# Customization
-
-## Customizing the Design
--   Edit CSS in `voting/templates/voting/base.html`
--   Adjust Bootstrap classes in templates
-
-## New Categories
--   Add via the Admin Panel
--   Optionally upload images
-
-## Code Settings
--   Change `max_uses` in the `VotingCode` model
--   Adjust the code length in `generate_code()`
 
 # Troubleshooting
 
@@ -245,6 +232,6 @@ python manage.py createsuperuser
 
 
 
-## Lizenz
+## License
 
 This project is licensed under the MIT License
