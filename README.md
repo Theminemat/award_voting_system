@@ -166,10 +166,10 @@ You can either use the voting interface directly or pass a code via the URL.
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'klassenabstimmung',
+            'NAME': 'you_db_name',
             'USER': 'your_user',
             'PASSWORD': 'your_password',
-            'HOST': 'localhost',
+            'HOST': 'your_db_ip',
             'PORT': '5432',
         }
     }
