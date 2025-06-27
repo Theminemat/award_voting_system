@@ -45,66 +45,67 @@ The system also supports **automatic email distribution of voting codes** to par
 
 ## Installation
 
-### 1. Voraussetzungen
+### 1. Prerequisites
 
 ```bash
-# Python 3.11+ installieren
-# pip installieren
+# Install Python 3.11+
+# Install pip
 ```
 
-### 2. Projekt klonen/herunterladen
+### 2. Clone/Download the Project
 
 ```bash
-# Projekt-Dateien in gewünschtes Verzeichnis kopieren
+# Copy the project files into your desired directory
+
 cd voting_system
 ```
 
-### 3. Abhängigkeiten installieren
+### 3. Install Dependencies
 
 ```bash
 pip install django pillow
 ```
 
-### 4. Datenbank einrichten
+### 4. Set Up the Database
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 5. Admin-Benutzer erstellen
+### 5. Create Admin User
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 6. Server starten
+### 6. Start the Server
 
 ```bash
 python manage.py runserver
 ```
 
-Die Anwendung ist dann unter `http://localhost:8000` erreichbar.
+The application will then be accessible at `http://localhost:8000`
 
-## Erste Schritte
+## Getting Started
 
-### 1. Admin-Panel aufrufen
+### 1. Access the Admin Panel
 
-- Gehe zu `http://localhost:8000/admin/`
-- Melde dich mit dem erstellten Admin-Account an
+- Go to `http://localhost:8000/admin/`
+- Log in with the admin account you created
 
-### 2. Personen hinzufügen
+### 2. Add Persons
 
-- Im Admin-Panel: **Voting** → **Persons** → **Hinzufügen**
-- Füge die Namen der Klassenmitglieder hinzu
+- In the admin panel: Voting → Persons → Add
+- Add the names of the class members
 
-### 3. Kategorien erstellen
+### 3. Create Categories
 
-- Im Admin-Panel: **Voting** → **Categories** → **Hinzufügen**
-- Erstelle Abstimmungskategorien (z.B. "Klassensprecher/in", "Lustigste Person")
-- Optional: Füge Bilder zu den Kategorien hinzu
+- In the admin panel: Voting → Categories → Add
+- Create voting categories (e.g., "Class President", "Funniest Person")
+- Optional: Add images to the categories
 
-### 4. Voting-Codes generieren
+### 4. Generate Voting Codes
 
 **Best method to generate voting codes:**
 
@@ -115,27 +116,28 @@ Go to /send-codes (you need to login at /admin first), enter the Emails of the p
 - Wähle die Aktion "10 neue Codes generieren" und klicke "Ausführen"
 - Die generierten Codes werden angezeigt
 
-### 5. Abstimmung durchführen
+### 5. Conduct the Voting
 
-- Hauptseite: `http://localhost:8000/`
-- Voting-Seite: `http://localhost:8000/vote/`
-- Mit Code-Parameter: `http://localhost:8000/vote/DEIN-CODE/`
+You can either use the voting interface directly or pass a code via the URL.
+- Homepage: `http://localhost:8000/`
+- Voting page: `http://localhost:8000/vote/`
+- With code parameter: `http://localhost:8000/vote/DEIN-CODE/`
 
-### 6. Ergebnisse anzeigen
+### 6. View Results
 
-- Ergebnisse (nur für Admins): `http://localhost:8000/results/`
-- Ergebnisse (live Counter Angabenanzahl): `http://localhost:8000/live-results/`
+- Results (admin only): `http://localhost:8000/results/`
+- Live submission counter (for displaying on a big screen visible for everyone, no results will be shown here): `http://localhost:8000/live-results/`
 
 ## URL-Struktur
 
 | URL              | Beschreibung                         |
 |------------------|--------------------------------------|
-| `/`              | Startseite mit Anleitung             |
-| `/vote/`         | Voting-Interface (Code-Eingabe)      |
-| `/vote/<code>/`  | Direkter Zugang mit Code             |
-| `/results/`      | Admin-Ergebnisse (Login erforderlich) |
-| `/live-results/` | Live Abgabencounter |
-| `/admin/`        | Django Admin-Panel (Login erforderlich)                  |
+| `/`              | 	Homepage with instructions           |
+| `/vote/`         | 	Voting interface (enter code)     |
+| `/vote/<code>/`  | 	Direct access with code            |
+| `/results/`      | Admin results view (login required) |
+| `/live-results/` | 	Live submission counter |
+| `/admin/`        | Django admin panel (login required)                |
 
 
 
